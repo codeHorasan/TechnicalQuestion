@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Scanner;
 
 class Row {
@@ -51,8 +50,9 @@ public class Answer {
         int sum = array[0].getList().get(0);
 
         for (int i=0; i< rowLength-1; i++) {
-            if (currentIndex==0) {
-                sum += determineNeighbourIndex(i+1, 0,1);
+            //If it is on the beginning or at the end of the row, there are 2 options, otherwise there are 3 options
+            if (currentIndex == 0 || currentIndex == rowLength-1) {
+                sum += determineNeighbourIndex(i+1, currentIndex, currentIndex+1);
             } else {
                 sum += determineNeighbourIndex(i+1, currentIndex-1, currentIndex, currentIndex+1);
             }
@@ -63,7 +63,6 @@ public class Answer {
 
     public static int determineNeighbourIndex(int rowIndex, int... params) {
         int[] paramsArray = params;
-        System.out.println(array[rowIndex].getList());
         int maxValue = 0;
         for (int i=0; i<paramsArray.length; i++) {
             if (array[rowIndex].getList().get(paramsArray[i]) > maxValue) {
@@ -74,6 +73,7 @@ public class Answer {
                 }
             }
         }
+        System.out.println(maxValue);
         return maxValue;
     }
 
