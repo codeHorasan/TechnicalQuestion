@@ -1,83 +1,45 @@
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.util.ArrayList;
 import java.util.Scanner;
 
-class Row {
-    //I choose to do it in this way so it would be dynamic to add element to each row
-    private ArrayList<Integer> list;
-
-    public Row(ArrayList<Integer> list) {
-        this.list = list;
-    }
-
-    public ArrayList<Integer> getList() {
-        return list;
-    }
-}
-
 public class Answer {
-    public static Row[] array;
-    public static int currentIndex = 0;
+    public static int[][] array = new int[256][256];
+    public static int LENGTH = 0;
+    public static final String FILE_NAME = "example.txt";
+    public static int sum = 0;
 
-    public static void main(String args[]) throws FileNotFoundException {
-        //I didn't use try catch for the FileNotFoundException so the code would be much more readable
-
-        Scanner sc = new Scanner(new BufferedReader(new FileReader("example.txt")));
-        //Determine the length of row from the txt file
-        int rowLength=0;
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner sc = new Scanner(new BufferedReader(new FileReader(FILE_NAME)));
         while(sc.hasNextLine()){
-            rowLength++;
-            sc.nextLine();
-        }
-        //Re-initializing scanner sc
-        sc = new Scanner(new BufferedReader(new FileReader("example.txt")));
-
-        array = new Row[rowLength];
-        int counter = 0;
-        while (sc.hasNextLine()) {
             String[] line = sc.nextLine().split(" ");
-            ArrayList<Integer> tempList = new ArrayList<>();
             for (int i=0; i<line.length; i++) {
-                tempList.add(Integer.parseInt(line[i]));
+                array[LENGTH][i] = Integer.parseInt(line[i]);
             }
-            array[counter] = new Row(new ArrayList<>(tempList));
-            counter++;
+            LENGTH++;
         }
 
-        //First value of the sum will be the first and only element of the first row
-        int sum = array[0].getList().get(0);
+        int sum = findMaxSum(0,0);
+        System.out.println("sum: " + sum);
+    }
 
-        for (int i=0; i< rowLength-1; i++) {
-            //If it is on the beginning or at the end of the row, there are 2 options, otherwise there are 3 options
-            if (currentIndex == 0 || currentIndex == rowLength-1) {
-                sum += determineNeighbourIndex(i+1, currentIndex, currentIndex+1);
+    public static int findMaxSum(int row, int column) {
+        if (isPrime(array[row][column])) {
+            return sum;
+        }
+
+        if (row == LENGTH-1) {
+            return array[row][column];
+        } else {
+            if (isPrime(array[row+1][column]) && isPrime(array[row+1][column+1])) {
+                array[row][column] = -1;
+                return array[row][column];
             } else {
-                sum += determineNeighbourIndex(i+1, currentIndex-1, currentIndex, currentIndex+1);
+                return array[row][column] + Math.max(findMaxSum(row + 1, column), findMaxSum(row + 1, column + 1));
             }
         }
-
-        System.out.println("Sum: " + sum);
     }
 
-    public static int determineNeighbourIndex(int rowIndex, int... params) {
-        int[] paramsArray = params;
-        int maxValue = 0;
-        for (int i=0; i<paramsArray.length; i++) {
-            if (array[rowIndex].getList().get(paramsArray[i]) > maxValue) {
-                //PRIME CONTROL
-                if (!isPrime(array[rowIndex].getList().get(paramsArray[i]))) {
-                    maxValue = array[rowIndex].getList().get(paramsArray[i]);
-                    currentIndex = paramsArray[i];
-                }
-            }
-        }
-        System.out.println(maxValue);
-        return maxValue;
-    }
-
-    //Checking if a number is prime or not
     public static boolean isPrime(int number) {
         if (number <= 1) {
             return false;
